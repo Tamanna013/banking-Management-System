@@ -6,7 +6,7 @@ using namespace std;
 class account{
 	int acno;
 	char name[50];
-	int deposit;
+	float deposit;
 	char type;
 public:
 	void create_account();
@@ -20,16 +20,26 @@ public:
 	char rettype() const;
 };
 void account::create_account(){
-	cout << "\n\t\t\tEnter the account No. : (Account no. must be 4 (or less) digits long) ";
+	cout << "\n\t\t\tEnter the account no. : (Account no. must be 4 (or less) digits long): ";
 	cin >> acno;
 	cin.ignore();
 	cout << "\n\n\t\t\tPlease enter the name of the account holder here : ";
 	cin.getline(name, 50);
-	cout << "\n\t\t\tEnter type of the account (C/S) : ";
-	cin >> type;
-	type = toupper(type);
-	cout << "\n\t\t\tEnter the initial amount : ";
-	cin >> deposit;
+	do{
+		cout << "\n\t\t\tEnter type of the account (C/S): ";
+		cin >> type;
+		type = toupper(type);
+		if (type != 'C' && type != 'S'){
+			cout << "\n\t\t\tInvalid type! Please enter 'C' for Current or 'S' for Savings.\n";
+		}
+	} while (type != 'C' && type != 'S');
+	do {
+		cout << "\n\t\t\tEnter the initial amount (must be positive): ";
+		cin >> deposit;
+		if (deposit <= 0) {
+			cout << "\n\t\t\tInvalid amount! Please enter a positive amount.\n";
+		}
+	} while (deposit <= 0);
 	cout << "\n\n\t\t\tAccount created..";
 }
 void account::show_account() const{
@@ -39,15 +49,44 @@ void account::show_account() const{
 	cout << "\n\t\t\tType of account : " << type;
 	cout << "\n\t\t\tBalance amount : " << deposit;
 }
-void account::modify(){
-	cout << "\n\t\t\tAccount No. : " << acno;
-	cout << "\n\t\t\tModify account holder name : ";
-	cin.getline(name, 50);
-	cout << "\n\t\t\tModify type of account : ";
-	cin >> type;
-	type = toupper(type);
-	cout << "\n\t\t\tModify balance amount : ";
-	cin >> deposit;
+void account::modify() {
+    int choice;
+    cout << "\n\t\t\tAccount No. : " << acno;
+    cout << "\n\t\t\tWhat do you want to modify?\n";
+    cout << "\t\t\t\t1. Account Holder Name\n";
+    cout << "\t\t\t\t2. Account Type\n";
+    cout << "\t\t\t\t3. Balance Amount\n";
+    cout << "\n\t\t\tEnter your choice (1-3): ";
+    cin >> choice;
+    cin.ignore();
+    switch(choice) {
+        case 1:
+            cout << "\n\t\t\tModify account holder name : ";
+            cin.getline(name, 50);
+            break;
+        case 2:
+            do {
+                cout << "\n\t\t\tModify type of account (C/S): ";
+                cin >> type;
+                type = toupper(type);
+                if (type != 'C' && type != 'S') {
+                    cout << "\n\t\t\tInvalid type! Please enter 'C' for Current or 'S' for Savings.\n";
+                }
+            } while (type != 'C' && type != 'S');
+            break;
+        case 3:
+            cout << "\n\t\t\tModify balance amount : ";
+            cin >> deposit;
+            while (deposit <= 0) {
+                cout << "\n\t\t\tInvalid amount! Please enter a positive amount: ";
+                cin >> deposit;
+            }
+            break;
+        default:
+            cout << "\n\t\t\tInvalid choice! No modifications made.";
+            break;
+    }
+    cout << "\n\t\t\tAccount details updated.";
 }
 void account::dep(int x){
 	deposit += x;
@@ -77,7 +116,7 @@ int main(){
 	char ch;
 	int num;
 	do{
-		system("clear");
+		system("CLS");
 		cout << "\n\n\t\t\t\t======================\n";
 		cout << "\t\t\t\tBANK MANAGEMENT SYSTEM";
 		cout << "\n\t\t\t\t======================\n";
@@ -100,17 +139,17 @@ int main(){
 			write_account();
 			break;
 		case '2':
-			system("clear");
+			system("CLS");
 			cout << "\n\n\t\t\tEnter the account no. : "; cin >> num;
 			deposit_withdraw(num, 1);
 			break;
 		case '3':
-			system("clear");
+			system("CLS");
 			cout << "\n\n\t\t\tEnter the account no. : "; cin >> num;
 			deposit_withdraw(num, 2);
 			break;
 		case '4':
-			system("clear");
+			system("CLS");
 			cout << "\n\n\t\t\tEnter The account no. : "; cin >> num;
 			display_sp(num);
 			break;
@@ -118,18 +157,18 @@ int main(){
 			display_all();
 			break;
 		case '6':
-			system("clear");
+			system("CLS");
 			cout << "\n\n\t\t\tEnter the account no. : "; cin >> num;
 			delete_account(num);
 			break;
 		case '7':
-			system("clear");
+			system("CLS");
 			cout << "\n\n\t\t\tEnter the account no. : "; cin >> num;
 			modify_account(num);
 			break;
 		case '8':
-			system("clear");
-			cout << "\n\n\t\tThank you for using the Banking System!!";
+			system("CLS");
+			cout << "\n\n\t\tThank you for using our Banking System!!";
 			break;
 		default:cout << "\a";
 		}
@@ -152,7 +191,7 @@ void display_sp(int n){
 	ifstream inFile;
 	inFile.open("account.dat", ios::binary);
 	if (!inFile){
-		cout << "File could not be open !! Press any key...";
+		cout << "Error opening the file!! Press any key to continue...";
 		return;
 	}
 	cout << "\n\t\t\tBALANCE DETAILS\n";
@@ -163,7 +202,7 @@ void display_sp(int n){
 		}
 	}
 	inFile.close();
-	if (flag == false) cout << "\n\n\t\t\tAccount number does not exist";
+	if (flag == false) cout << "\n\n\t\t\tAccount number does not exist.";
 }
 void modify_account(int n){
 	bool found = false;
@@ -171,7 +210,7 @@ void modify_account(int n){
 	fstream File;
 	File.open("account.dat", ios::binary | ios::in | ios::out);
 	if (!File){
-		cout << "Error opening the file !! Press any key...";
+		cout << "Error opening the file!! Press any key to continue...";
 		return;
 	}
 	while (!File.eof() && !found){
@@ -197,7 +236,7 @@ void delete_account(int n){
 	ofstream outFile;
 	inFile.open("account.dat", ios::binary);
 	if (!inFile){
-		cout << "Error opening file !! Press any key...";
+		cout << "Error opening file!! Press any key to continue...";
 		return;
 	}
 	outFile.open("Temp.dat", ios::binary);
@@ -211,15 +250,15 @@ void delete_account(int n){
 	outFile.close();
 	remove("account.dat");
 	rename("Temp.dat", "account.dat");
-	cout << "\n\nRecord Deleted ..";
+	cout << "\n\n\t\tRecord Deleted ..";
 }
 void display_all(){
-	system("clear");
+	system("CLS");
 	account ac;
 	ifstream inFile;
 	inFile.open("account.dat", ios::binary);
 	if (!inFile){
-		cout << "\n\n\t\tFile could not be open !! Press any key...";
+		cout << "\n\n\t\tError opening the file!! Press any key to continue...";
 		return;
 	}
 	cout << "\n\n\t\tACCOUNT HOLDER LIST\n\n";
@@ -238,7 +277,7 @@ void deposit_withdraw(int n, int option){
 	fstream File;
 	File.open("account.dat", ios::binary | ios::in | ios::out);
 	if (!File){
-		cout << "File could not be open !! Press any key...";
+		cout << "Error opening the file!! Press any key to continue...";
 		return;
 	}
 	while (!File.eof() && found == false){
